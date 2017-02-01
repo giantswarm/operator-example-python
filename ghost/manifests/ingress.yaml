@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ metadata.name }}
+  namespace: {{ metadata.namespace }}
+  labels:
+    app: {{ metadata.name }}
+    thirdparty: Ghost
+  # annotations:
+  #   kubernetes.io/tls-acme: "true"
+spec:
+  # rules:
+  # - host: {{ spec.url }}
+  #   http:
+  #     paths:
+  #     - path: /
+  #       backend:
+  #         serviceName: {{ metadata.name }}
+  #         servicePort: 2368
+  # tls:
+  # - secretName: {{ metadata.name }}-tls
+  #   hosts:
+  #   - {{ spec.url }}
+
+  backend:
+    serviceName: {{ metadata.name }}
+    servicePort: 2368

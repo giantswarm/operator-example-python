@@ -1,0 +1,72 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ metadata.name }}
+  namespace: {{ metadata.namespace }}
+  labels:
+    app: {{ metadata.name }}
+    thirdparty: ghost
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ metadata.name }}
+        thirdparty: ghost
+    spec:
+      containers:
+      - name: {{ metadata.name }}
+        # image: bitnami/ghost
+        image: ghost:0.11.3
+        imagePullPolicy: IfNotPresent
+        # env:
+        # - name: MARIADB_HOST
+        #   value: mariadb
+        # - name: MARIADB_PORT
+        #   value: "3306"
+        # - name: MARIADB_PASSWORD
+        #   value: ghost
+        #   # valueFrom:
+        #   #   secretKeyRef:
+        # - name: GHOST_HOST
+        #   value: {{ host }}
+        # # - name: GHOST_PORT
+        # - name: GHOST_USERNAME
+        #   value: admin
+        # - name: GHOST_PASSWORD
+        #   value: password
+        #   # valueFrom:
+        #   #   secretKeyRef:
+        #   #     name:
+        #   #     key: ghost-password
+        ports:
+        - name: http
+          containerPort: 2368
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 120
+          timeoutSeconds: 5
+        # readinessProbe:
+        #   exec:
+        #     command:
+        #     - sh
+        #     - -c
+        #     - nami status ghost | grep "ghost is running"
+        #   initialDelaySeconds: 5
+        #   timeoutSeconds: 1
+#         resources:
+      #   volumeMounts:
+      #   - name: ghost-data
+      #     mountPath: /bitnami/ghost
+      # volumes:
+      # - name: ghost-data
+      #   emptyDir: {}
+
+      # - name: config
+      #   configmap > /etc/ghost
+
+      # /var/lib/ghost/content for content?
+      #    apps, data, images and themes
+      #    ^needed, maybe init-container

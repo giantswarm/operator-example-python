@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ metadata.name }}
+  namespace: {{ metadata.namespace }}
+  labels:
+    app: {{ metadata.name }}
+    thirdparty: ghost
+data:
+  config.example.js: |
+    var path = require('path'),
+      config;
+
+    config = {
+      production: {
+        url: '{{ spec.url }}',
+          mail: {
+            transport: 'SMTP',
+            options: {
+              service: '{{ spec.mail.service.type }}',
+              auth: {
+                user: '{{ spec.mail.service.auth.user }}',
+                pass: '{{ spec.mail.service.auth.pass }}'
+              }
+            }
+          },
+        database: {
+          # if mariadb, sqlite3, ..
+          client: 'sqlite3',
+          connection: {
+            filename: path.join(__dirname, '/content/data/ghost.db')
+          },
+          debug: false
+        },
+        server: {
+          host: '0.0.0.0',
+          port: '2368'
+        }
+      }
+    };
+
+    module.exports = config;

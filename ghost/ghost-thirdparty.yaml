@@ -1,0 +1,7 @@
+apiVersion: extensions/v1beta1
+kind: ThirdPartyResource
+description: "An operator to manage Ghost deployments."
+metadata:
+  name: "ghost.experimantal.giantswarm.com"
+versions:
+  - name: v1
