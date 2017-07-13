@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ metadata.name }}
+  namespace: {{ metadata.namespace }}
+  labels:
+    app: {{ metadata.name }}
+    thirdparty: Ghost
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ metadata.name }}
+        thirdparty: ghost
+    spec:
+      containers:
+      - name: {{ metadata.name }}
+        # image: bitnami/ghost
+        image: giantswarm/ghost-operator-test
+        imagePullPolicy: IfNotPresent
+        command:

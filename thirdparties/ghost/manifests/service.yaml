@@ -7,6 +7,7 @@ metadata:
     app: {{ metadata.name }}
     thirdparty: Ghost
 spec:
+  type: NodePort
   ports:
   - name: http
     port: 2368

@@ -5,7 +5,7 @@ from pathlib import Path
 from functools import lru_cache
 import itertools
 import click
-from generic_api import GenericApi
+from .generic_api import GenericApi
 
 
 # FIXME
@@ -22,31 +22,37 @@ class Operator(object):
         # FIXME does not pick up config changes after initialized
         self.generic = GenericApi()
 
-    # FIXME use ttl_cache instead
-    @lru_cache(maxsize=128)
-    def lookup_resource(self, api_version, kind):
-        api_prefix = "api" if api_version == "v1" else "apis"
-        resources = self.generic.call_api(f"/{api_prefix}/{api_version}", "GET")[0]["resources"]
-        for resource in resources:
-            if resource["kind"]==kind and "/" not in resource["name"]:
-                return resource
-
-    def build_url(self, api_version, kind, namespace=None):
-        resource = self.lookup_resource(api_version, kind)
-        if not resource:
-            print("ERR", api_version, kind)
-            exit
-
-        api_prefix = "api" if api_version == "v1" else "apis"
-        if resource["namespaced"] and namespace:
-            # if not namespace:
-            #     namespace = "default"
-            return f"/{api_prefix}/{api_version}/namespaces/{namespace}/{resource['name']}"
-
-        return f"/{api_prefix}/{api_version}/{resource['name']}"
-
 
     # FIXME api/kind to watch as config-parameter
+
+    # FIXME make argument "base" optional
+    def apply_template(self, templates_base, manifest_rel, values):
+        env = Environment(loader=FileSystemLoader(os.fspath(templates_base)))
+
+        # rel_path = os.path.relpath(item, start=templates_base)
+        template = env.get_template(manifest_rel)
+        manifest = yaml.load(template.render(values))
+        # print(manifest)
+        # print(values)
+
+        api_version = manifest['apiVersion']
+        kind = manifest['kind']
+        namespace = manifest['metadata'].get('namespace')
+        url = self.generic.build_url(api_version, kind, namespace)
+        #^ or: build_url_for_manifest
+
+        # FIXME check for changes in manifest and take care to re-apply
+        # and restart pods if necessary
+        print(f"POST {url}") # FIXME log
+
+        print(manifest)
+
+        # try:
+        #     result = self.generic.call_api(url, "POST", body=manifest)
+        #     print(f"result: ", result)
+        # except kubernetes.client.rest.ApiException as e:
+        #     print(f"! kubernetes.client.rest.ApiException: {e}")
+
 
     # maybe base_path + rel?
     def apply_templates(self, path, values):
@@ -101,8 +107,7 @@ class Operator(object):
             ("v1", "Pod"),
             ("v1", "ConfigMap"),
             ("v1", "Service"),
-            ("extensions/v1beta1", "Ingress")
-        ]
+            ("extensions/v1beta1", "Ingress")]
 
         for api_version, kind in kinds:
             url = self.build_url(api_version, kind, namespace) + f"?labelSelector=app={name},thirdparty={thirdparty_kind}"
@@ -136,7 +141,7 @@ class Operator(object):
 
             if event['type'] == "ADDED" and event['object']['kind'] == kind:
                 self.apply_templates(
-                    path=Path() / kind.lower() / "manifests",
+                    path=Path(os.path.dirname(__file__)) / ".." / "thirdparties" / kind.lower() / "manifests",
                     values=event['object'])
 
             # FIXME check regularly for absent `ghost`s

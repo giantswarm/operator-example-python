@@ -9,4 +9,4 @@ RUN pip install \
 WORKDIR /usr/src/app
 COPY . /usr/src/app
 
-CMD ["python", "./operator.py"]
+# CMD ["python", "./operator.py"]

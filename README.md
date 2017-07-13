@@ -8,38 +8,43 @@ Some commands to test:
 ```bash
 docker build --tag local/opy .
 
-context="my-kubectl-config-context"
 
-
-kubectl --context $context apply --filename ./ghost/ghost-thirdparty.yaml
+kubectl apply --filename ./ghost/ghost-thirdparty.yaml
 
 docker run -v $HOME/.kube:/root/.kube -t local/opy python opy.py \
-  --context $context \
   --api-version experimantal.giantswarm.com/v1 \
   --kind Ghost
 
-kubectl --context $context create --filename ./ghost/ghost-1.yaml
+kubectl create --filename ./ghost/ghost-1.yaml
 
-kubectl --context $context create --filename ./ghost/ghost-2.yaml
+kubectl create --filename ./ghost/ghost-2.yaml
 
-kubectl --context $context get --all-namespaces ghosts
-
-
-kubectl --context $context get --all-namespaces ingress -o wide
-
-kubectl --context $context run -ti --rm tiny-tools --image giantswarm/tiny-tools curl ghost-1.ghost-test-1.svc:2368
+kubectl get --all-namespaces ghosts
 
 
-kubectl --context $context --namespace ghost-test-1 delete ghost ghost-1
+kubectl get --all-namespaces ingress -o wide
 
-kubectl --context $context --namespace ghost-another-test delete ghost ghost-2
+kubectl run -ti --rm tiny-tools --image giantswarm/tiny-tools curl ghost-1.ghost-test-1.svc:2368
 
-kubectl --context $context delete thirdpartyresource ghost.experimantal.giantswarm.com
 
-kubectl --context $context delete namespace --now ghost-test-1
+kubectl --namespace ghost-test-1 delete ghost ghost-1
 
-kubectl --context $context delete namespace --now ghost-another-test
+kubectl --namespace ghost-another-test delete ghost ghost-2
 
-kubectl --context $context get namespaces
+kubectl delete thirdpartyresource ghost.experimantal.giantswarm.com
+
+kubectl delete namespace --now ghost-test-1
+
+kubectl delete namespace --now ghost-another-test
+
+kubectl get namespaces
 
 ```
+
+## Todo
+
+- Create Docker image for the `python-operator`
+- Decide on naming this thing
+- Add helper to list all the resources within a namespace
+- Clean up code, add proper logging, more exception handling
+- Decide how to identify orphans. In case not everything got deleted on the first try.

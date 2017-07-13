@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: dbop
+  namespace: dbop2
+  labels:
+    app: dbop
+    # thirdparty: dbop
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dbop
+        # thirdparty: dbop
+    spec:
+      containers:
+      - name: dbop
+        image: giantswarm/python-operator-test:db1
+        # imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
+        command: ["sleep", "90000"]

@@ -5,7 +5,7 @@ metadata:
   namespace: {{ metadata.namespace }}
   labels:
     app: {{ metadata.name }}
-    thirdparty: ghost
+    thirdparty: Ghost
 data:
   config.example.js: |
     var path = require('path'),

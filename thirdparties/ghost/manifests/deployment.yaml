@@ -5,7 +5,7 @@ metadata:
   namespace: {{ metadata.namespace }}
   labels:
     app: {{ metadata.name }}
-    thirdparty: ghost
+    thirdparty: Ghost
 spec:
   replicas: 1
   template:

@@ -4,7 +4,7 @@ metadata:
   name: ghost-1
   namespace: ghost-test-1
 spec:
-  url: "ghost-1.kube.thisone.rocks"
+  # url: "ghost-1.some.url"
   mail:
     from: '"Custom Name" <myemail@address.com>'
     service:
